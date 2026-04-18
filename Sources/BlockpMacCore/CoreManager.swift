@@ -95,7 +95,8 @@ public struct CoreManager: Sendable {
             throw CoreManagerError.noActiveSession
         }
 
-        if let endsAt = state.session.endsAt,
+        if state.policy.strictMode,
+           let endsAt = state.session.endsAt,
            now < endsAt {
             throw CoreManagerError.strictSessionCannotStop(endsAt.timeIntervalSince(now))
         }

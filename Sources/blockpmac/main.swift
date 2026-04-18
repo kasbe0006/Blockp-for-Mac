@@ -273,10 +273,10 @@ struct BlockpMacCLI {
 
         Examples:
           blockpmac --state-path ./state.json import-rules --rules ./rules.sample.json
-                    blockpmac --state-path ./state.json session-start --days 1
+          blockpmac --state-path ./state.json session-start --days 1
           blockpmac --state-path ./state.json session-start --minutes 30
-                    blockpmac --state-path ./state.json mode-set --mode allowlist
-                    blockpmac --state-path ./state.json events --limit 10
+          blockpmac --state-path ./state.json mode-set --mode allowlist
+          blockpmac --state-path ./state.json events --limit 10
           blockpmac --state-path ./state.json check --url https://instagram.com/reels
           blockpmac --state-path ./state.json session-stop
         """)
@@ -318,18 +318,18 @@ struct BlockpMacCLI {
             throw CLIError(message: "Self-test failed: allow rule")
         }
 
-                _ = try manager.setEnforcementMode(.allowlist)
-                let allowlistAllowed = try manager.evaluate(host: "instagram.com")
-                guard !allowlistAllowed.shouldBlock,
-                            allowlistAllowed.reason == .activeSessionAllowlistRuleMatch else {
-                        throw CLIError(message: "Self-test failed: allowlist allow match")
-                }
-                let allowlistBlocked = try manager.evaluate(host: "example.com")
-                guard allowlistBlocked.shouldBlock,
-                            allowlistBlocked.reason == .activeSessionAllowlistRuleMiss else {
-                        throw CLIError(message: "Self-test failed: allowlist block miss")
-                }
-                _ = try manager.setEnforcementMode(.blocklist)
+        _ = try manager.setEnforcementMode(.allowlist)
+        let allowlistAllowed = try manager.evaluate(host: "instagram.com")
+        guard !allowlistAllowed.shouldBlock,
+              allowlistAllowed.reason == .activeSessionAllowlistRuleMatch else {
+            throw CLIError(message: "Self-test failed: allowlist allow match")
+        }
+        let allowlistBlocked = try manager.evaluate(host: "example.com")
+        guard allowlistBlocked.shouldBlock,
+              allowlistBlocked.reason == .activeSessionAllowlistRuleMiss else {
+            throw CLIError(message: "Self-test failed: allowlist block miss")
+        }
+        _ = try manager.setEnforcementMode(.blocklist)
 
         _ = try manager.stopSession(now: Date().addingTimeInterval(121))
 

@@ -23,21 +23,3 @@ public struct BlockList: Codable, Sendable {
         self.rules = rules
     }
 }
-
-public struct FocusSession: Sendable {
-    public let startDate: Date
-    public let duration: TimeInterval
-
-    public init(startDate: Date = Date(), duration: TimeInterval) {
-        self.startDate = startDate
-        self.duration = duration
-    }
-
-    public var endDate: Date {
-        startDate.addingTimeInterval(duration)
-    }
-
-    public func isActive(at now: Date = Date()) -> Bool {
-        now >= startDate && now <= endDate
-    }
-}

@@ -27,7 +27,7 @@ A macOS-focused foundation inspired by BlockP, with a strong local core + menu b
 ### 1) Test the core
 
 ```bash
-cd /Users/prathameshkasbe/blockp
+cd blockp
 swift run blockpmac self-test
 ```
 
@@ -148,7 +148,7 @@ Exit codes:
 ## Demo walkthrough
 
 ```bash
-cd /Users/prathameshkasbe/blockp
+cd blockp
 
 # Clean up and start fresh
 rm -f ./demo-state.json
@@ -188,7 +188,7 @@ swift run blockpmac --state-path ./demo-state.json status
 ## Build and run
 
 ```bash
-cd /Users/prathameshkasbe/blockp
+cd blockp
 
 # Build everything
 swift build -c debug

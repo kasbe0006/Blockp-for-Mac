@@ -11,19 +11,20 @@ class AppStateModel: ObservableObject {
     @Published var recentEvents: [SecurityEvent] = []
 
     private let manager: CoreManager
-    private let systemEventStore = SecurityEventStore(logFilePath: "/Library/PrivilegedHelperTools/BlockpMac/events.log")
+    private let systemEventStore: SecurityEventStore
     private var timerTask: Task<Void, Never>?
+
+    private static let eventLogPath: String = {
+        let libraryPath = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first?.path ?? NSHomeDirectory()
+        return "\(libraryPath)/PrivilegedHelperTools/BlockpMac/events.log"
+    }()
 
     init(manager: CoreManager) {
         self.manager = manager
+        self.systemEventStore = SecurityEventStore(logFilePath: Self.eventLogPath)
         do {
             self.appState = try manager.getState()
-            if !appState.session.isCurrentlyActive(),
-               appState.session.isActive,
-               let endsAt = appState.session.endsAt,
-               endsAt <= Date() {
-                appState.session = SessionState(isActive: false, startedAt: appState.session.startedAt, endsAt: endsAt, lastBreakAt: appState.session.lastBreakAt, lockedUntil: nil)
-            }
+            cleanupExpiredSession()
         } catch {
             self.appState = AppState()
             self.errorMessage = error.localizedDescription
@@ -34,15 +35,19 @@ class AppStateModel: ObservableObject {
         refreshEvents()
     }
 
+    private func cleanupExpiredSession() {
+        if !appState.session.isCurrentlyActive(),
+           appState.session.isActive,
+           let endsAt = appState.session.endsAt,
+           endsAt <= Date() {
+            appState.session = SessionState(isActive: false, startedAt: appState.session.startedAt, endsAt: endsAt, lastBreakAt: appState.session.lastBreakAt, lockedUntil: nil)
+        }
+    }
+
     func refreshState() {
         do {
             appState = try manager.getState()
-            if !appState.session.isCurrentlyActive(),
-               appState.session.isActive,
-               let endsAt = appState.session.endsAt,
-               endsAt <= Date() {
-                appState.session = SessionState(isActive: false, startedAt: appState.session.startedAt, endsAt: endsAt, lastBreakAt: appState.session.lastBreakAt, lockedUntil: nil)
-            }
+            cleanupExpiredSession()
             errorMessage = nil
             updateSessionTimeRemaining()
             updatePenaltyTimeRemaining()
@@ -223,8 +228,8 @@ class AppStateModel: ObservableObject {
     }
 
     var canStopSession: Bool {
-        guard appState.session.isCurrentlyActive() else { return false }
-        guard let endsAt = appState.session.endsAt else { return false }
+        guard appState.session.isActive else { return false }
+        guard let endsAt = appState.session.endsAt else { return true }
         return Date() >= endsAt
     }
 

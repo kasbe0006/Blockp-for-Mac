@@ -3,7 +3,7 @@ import SwiftUI
 import BlockpMacCore
 
 @main
-final class BlockpMacAppMain: NSObject, NSApplicationDelegate, NSWindowDelegate {
+final class BlockpMacAppMain: NSObject, NSApplicationDelegate {
     private var window: NSWindow?
     private var statusItem: NSStatusItem?
     private var popover: NSPopover?
@@ -29,24 +29,6 @@ final class BlockpMacAppMain: NSObject, NSApplicationDelegate, NSWindowDelegate 
 
         let model = AppStateModel(manager: manager)
         stateModel = model
-
-        let rootView = ContentView(stateModel: model)
-            .frame(minWidth: 380, minHeight: 520)
-
-        let hostingController = NSHostingController(rootView: rootView)
-
-        let window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 420, height: 560),
-            styleMask: [.titled, .closable, .miniaturizable, .resizable],
-            backing: .buffered,
-            defer: false
-        )
-        window.title = "BlockpMac"
-        window.center()
-        window.contentViewController = hostingController
-        window.delegate = self
-        window.makeKeyAndOrderFront(nil)
-        self.window = window
 
         let popover = NSPopover()
         popover.behavior = .transient
@@ -103,24 +85,5 @@ final class BlockpMacAppMain: NSObject, NSApplicationDelegate, NSWindowDelegate 
         alert.addButton(withTitle: "OK")
         alert.runModal()
         return .terminateCancel
-    }
-
-    func windowShouldClose(_ sender: NSWindow) -> Bool {
-        guard let stateModel else {
-            return true
-        }
-
-        stateModel.refreshState()
-        if stateModel.canTerminateApplication {
-            return true
-        }
-
-        let alert = NSAlert()
-        alert.alertStyle = .warning
-        alert.messageText = "Cannot Close Window During Active Restriction"
-        alert.informativeText = stateModel.terminationBlockedMessage
-        alert.addButton(withTitle: "OK")
-        alert.runModal()
-        return false
     }
 }

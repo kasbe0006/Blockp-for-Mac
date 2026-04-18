@@ -14,8 +14,7 @@ let package = Package(
         .executable(
             name: "blockpmac",
             targets: ["blockpmac"]
-        )
-        ,
+        ),
         .executable(
             name: "BlockpMacApp",
             targets: ["BlockpMacApp"]
